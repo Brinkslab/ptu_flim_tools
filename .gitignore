@@ -1,0 +1,29 @@
+# Example git ignore #
+
+# Compiled code
+*.exe
+*.pyc
+__pycache__/
+*.pyc
+Deprecated
+
+# Large files:
+*.tif
+*.png
+*.json
+*.log
+Thumbs.db
+
+# jupyternotebook cache
+*.ipynb_checkpoints
+**/Data/**
+**/Test**.py
+**Temp**.py
+**/Temp/**
+**/TestData/**
+**/TrainingResults/**
+**/build/**
+**/dist/**
+**.egg**
+
+.DS_Store

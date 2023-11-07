@@ -19,8 +19,15 @@ classifiers = [
   "Topic :: Scientific/Engineering :: Bio-Informatics",
 ]
 dependencies= [
+  "imagecodecs",
+  "numpy",
+  "tifffile",
 ]
 
 [project.urls]
 "Homepage" = "https://github.com/Brinkslab/ptu_flim_tools"
 "Bug Tracker" = "https://github.com/Brinkslab/ptu_flim_tools/issues"
+
+[project.scripts]
+ptu_to_tiff = "ptu_flim_tools:ptu_to_tiff._main"
+tiff_to_avi = "ptu_flim_tools:tiff_to_avi._main"

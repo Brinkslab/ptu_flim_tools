@@ -22,6 +22,7 @@ dependencies= [
   "imagecodecs",
   "numpy",
   "tifffile",
+  "tttrlib",
 ]
 
 [project.urls]

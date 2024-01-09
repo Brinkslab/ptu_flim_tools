@@ -27,12 +27,7 @@ def _write_tiff(name, data, output_dir, stem, comment=None):
 def _read_ptu_intensity(path):
     tttr = tttrlib.TTTR(path)
     image = tttrlib.CLSMImage(tttr, fill=True, channels=(0,))
-
-    logging.info("converting to 8bit")
-    if image.intensity.max() > 0xFF:
-        raise RuntimeError("data can't be converted to 8 bit")
-
-    return image.intensity.astype(np.uint8)
+    return image.intensity
 
 
 def _read_ptu_mean_lifetime(

@@ -3,7 +3,6 @@
 import logging
 import pathlib
 
-import numpy as np
 import tifffile
 import tttrlib
 
@@ -58,9 +57,9 @@ def _read_ptu_mean_lifetime(
         image.fill(tttr, (0,), False)
         bin_min, bin_max = None, None
 
-    stack = image.get_mean_lifetime(tttr, min_photons)[bin_min:bin_max]
+    stack = image.get_mean_lifetime(tttr, min_photons)
     image.stack_frames()
-    cumulative = image.get_mean_lifetime(tttr, min_photons)[bin_min:bin_max]
+    cumulative = image.get_mean_lifetime(tttr, min_photons)
     return stack, cumulative
 
 
@@ -84,7 +83,7 @@ def ptu_to_tiff(ptu_path, output_dir=None):
     stack = _read_ptu_intensity(path)
 
     # sum of all frames collapsed into one
-    cumulative = stack.sum(axis=0, dtype=np.uint8)
+    cumulative = stack.sum(axis=0, dtype=stack.dtype)
 
     size = round(stack.nbytes / 10**6, 2)
     logging.debug(f"stack shape {stack.shape}, {size} mb, {stack.dtype}")

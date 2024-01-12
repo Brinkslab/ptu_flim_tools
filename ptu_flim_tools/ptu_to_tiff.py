@@ -8,6 +8,9 @@ import tifffile
 import tttrlib
 
 
+DEFAULT_LOGLEVEL = logging.INFO
+
+
 def _write_tiff(name, data, output_dir, stem, comment=None):
     logging.info(f"writing {name} as compressed tiff")
     tif_path = output_dir / f"{name}_{stem}.tif"
@@ -33,6 +36,10 @@ def _read_ptu_intensity(path):
 def _read_ptu_mean_lifetime(
     path, min_photons=1, binrange=None, xrange=None, yrange=None
 ):
+    logging.debug(
+        f"calculating lifetime min_photons={min_photons}, "
+        f"binrange={binrange}, xrange={xrange}, yrange={yrange}"
+    )
     if min_photons is None:
         min_photons = 1
 
@@ -80,7 +87,7 @@ def ptu_to_tiff(ptu_path, output_dir=None):
     cumulative = stack.sum(axis=0, dtype=np.uint8)
 
     size = round(stack.nbytes / 10**6, 2)
-    logging.info(f"stack shape {stack.shape}, {size} mb, {stack.dtype}")
+    logging.debug(f"stack shape {stack.shape}, {size} mb, {stack.dtype}")
 
     _write_tiff("stack", stack, output_dir, path.stem)
     _write_tiff("sum", cumulative, output_dir, path.stem)
@@ -115,7 +122,7 @@ def ptu_to_tiff_lifetime(
     )
 
     size = round(stack.nbytes / 10**6, 2)
-    logging.info(f"stack shape {stack.shape}, {size} mb, {stack.dtype}")
+    logging.debug(f"stack shape {stack.shape}, {size} mb, {stack.dtype}")
 
     _write_tiff("lifetime", stack, output_dir, path.stem)
     _write_tiff("avglifetime", cumulative, output_dir, path.stem)
@@ -123,11 +130,6 @@ def ptu_to_tiff_lifetime(
 
 def _main():
     import argparse
-
-    logging.basicConfig(
-        level=logging.INFO,
-        format="%(asctime)s:%(levelname)s:%(name)s:%(message)s",
-    )
 
     parser = argparse.ArgumentParser()
     parser.add_argument("ptu_path", help="path of the ptu file to parse")
@@ -146,7 +148,7 @@ def _main():
     parser.add_argument(
         "-p",
         "--mean-lifetime-min-photons",
-        nargs=1,
+        type=int,
         help="minimum amount of photons required to include this pixel in the "
         "mean lifetime image",
     )
@@ -154,21 +156,36 @@ def _main():
         "-b",
         "--mean-lifetime-binrange",
         nargs=2,
+        type=int,
         help="a range to clip the values used for the mean lifetime image",
     )
     parser.add_argument(
         "-x",
         "--mean-lifetime-xrange",
         nargs=2,
+        type=int,
         help="the x range of an roi for the mean lifetime image",
     )
     parser.add_argument(
         "-y",
         "--mean-lifetime-yrange",
         nargs=2,
+        type=int,
         help="the y range of an roi for the mean lifetime image",
     )
+    parser.add_argument(
+        "-v", "--verbose", action="count", default=0, help="print more output"
+    )
+    parser.add_argument(
+        "-s", "--silent", action="count", default=0, help="print less output"
+    )
     args = parser.parse_args()
+
+    loglevel = max(0, DEFAULT_LOGLEVEL + 10 * (args.silent - args.verbose))
+    logging.basicConfig(
+        level=loglevel,
+        format="%(asctime)s:%(levelname)s:%(name)s:%(message)s",
+    )
 
     if args.mean_lifetime:
         ptu_to_tiff_lifetime(
